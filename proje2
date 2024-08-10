@@ -1,0 +1,146 @@
+-- Öğrenci tablosunu oluşturur
+create table ogrenci (
+    OgrAdı VARCHAR(50) NOT NULL,
+    OgrSoyadı VARCHAR(50) NOT NULL,
+	OgrYası INT,
+	Cinsiyet VARCHAR(5),
+	OgrNo INT PRIMARY KEY,
+    BolumID INT,
+	FOREIGN KEY (BolumID) REFERENCES Bolum(BolumID)
+);
+
+-- Ders tablosunu oluşturur
+create table Ders (
+    DersKodu INT PRIMARY KEY,
+    DersAdı VARCHAR(100) NOT NULL,
+	DersSayısı INT
+);
+
+-- Bölüm tablosunu oluşturur
+CREATE TABLE Bolum (
+    BolumID INT PRIMARY KEY,
+    BolumAdı VARCHAR(100) NOT NULL
+);
+
+-- Notlar tablosunu oluşturur
+create table Notlar (
+    OgrNo INT,
+    DersKodu INT,
+    VizeNotu TINYINT,
+    FinalNotu TINYINT,
+	Ortalaması AS ((VizeNotu+FinalNotu)/2),
+    PRIMARY KEY (OgrNo, DersKodu),
+    FOREIGN KEY (OgrNo) REFERENCES ogrenci(OgrNo),
+    FOREIGN KEY (DersKodu) REFERENCES Ders(DersKodu)
+);
+
+-- Öğretim Üyeleri tablosunu oluşturur
+CREATE TABLE OgretimUyeleri (
+    OgretimUyesiID INT IDENTITY(1,1) PRIMARY KEY,
+    Ad VARCHAR(50) NOT NULL,
+    Soyad VARCHAR(50) NOT NULL,
+    Unvan VARCHAR(50)
+);
+
+-- Ders programları tablosunu oluşturur
+CREATE TABLE DersProgramlari (
+    ProgramID INT IDENTITY PRIMARY KEY,
+    DersKodu INT,
+    OgretimUyesiID INT,
+    Gun VARCHAR(10),
+    Saat VARCHAR(10),
+    FOREIGN KEY (DersKodu) REFERENCES Ders(DersKodu),
+    FOREIGN KEY (OgretimUyesiID) REFERENCES OgretimUyeleri(OgretimUyesiID)
+);
+
+
+-- Öğrenci verilerini ekler
+INSERT INTO ogrenci (OgrNo, OgrAdı, OgrSoyadı, OgrYası, Cinsiyet, BolumID)
+VALUES
+(201, 'Zeynep', 'Yurt', 20, 'Kadın', 2),
+(202, 'Mehmet', 'Özkan', 23, 'Erkek', 3),
+(203, 'Elif', 'Demir', 22, 'Kadın', 1),
+(204, 'Ege', 'Çelik', 21, 'Erkek', 2),
+(205, 'Aylin', 'Kara', 24, 'Kadın', 3),
+(206, 'Can', 'Yılmaz', 22, 'Erkek', 1);
+
+-- Ders verilerini ekler
+INSERT INTO Ders (DersKodu, DersAdı, DersSayısı)
+VALUES
+(101, 'Kimya I',4),
+(102, 'İstatistik',3),
+(103, 'Yapay Zeka',5),
+(104, 'Veritabanı Yönetim Sistemleri',4),
+(105, 'Makine Öğrenmesi',3),
+(106, 'Ağ Temelleri',3),
+(107, 'İşletim Sistemleri',4);
+
+-- Bölüm verilerini ekler
+INSERT INTO Bolum (BolumID, BolumAdı)
+VALUES
+(1, 'Bilgisayar Mühendisliği'),
+(2, 'Elektrik Elektronik Mühendisliği'),
+(3, 'Fizik'),
+(4, 'Matematik');
+
+-- Ders verilerini ekler
+INSERT INTO Notlar (OgrNo, DersKodu, VizeNotu, FinalNotu)
+VALUES
+(202, 104, 75, 85),
+(204, 102, 65, 70),
+(206, 103, 90, 92),
+(203, 101, 55, 78),
+(205, 105, 80, 85),
+(201, 107, 88, 91);
+
+-- Öğretim Üyelerinin verilerini ekler
+INSERT INTO OgretimUyeleri (Ad, Soyad, Unvan)
+VALUES
+('Ahmet', 'Kara', 'Matematik Hocası'),
+('Ayşe', 'Yılmaz', 'Fizik Hocası'),
+('Ali', 'Kaya', 'Programlama Hocası');
+
+-- Öğrenci numarası 201 olan öğrencinin notlarını siler
+-- Öğrenci numarası 206 olan öğrencinin Yapay Zeka dersini siler
+DELETE FROM Notlar WHERE OgrNo = 201;
+DELETE FROM Notlar WHERE OgrNo = 206 AND DersKodu = 103;
+
+-- Ders adı 'İşletim Sistemleri' olan dersi 'Lineer Cebir' olarak günceller
+-- Bölüm adı 'Elektrik Elektronik Mühendisliği' olan bölümü 'Yazılım Mühendisliği' olarak günceller
+-- 'Kimya I' dersinin ders sayısını bir azaltır
+UPDATE Ders SET DersAdı = 'Lineer Cebir' WHERE DersKodu = 107;
+UPDATE Bolum SET BolumAdı = 'Yazılım Mühendisliği' WHERE BolumID  = 2;
+UPDATE Ders SET DersSayısı=DersSayısı-1 WHERE DersKodu=101;
+
+-- Yeni bir ders ekler
+INSERT INTO Ders (DersKodu, DersAdı,DersSayısı) VALUES (108, 'Kimya II',4);
+
+-- Sorgular
+-- Ders kodu 1 ile 7 arasında olan dersleri seçer
+-- Notları vize notuna göre artan sırada listeler
+-- Notları final notuna göre azalan sırada listeler
+SELECT * FROM Ders WHERE DersKodu BETWEEN 1 AND 7;
+SELECT * FROM Notlar ORDER BY VizeNotu ASC;
+SELECT * FROM Notlar ORDER BY FinalNotu DESC;
+
+-- Belirli bölümlere ait öğrencileri listeler
+SELECT * FROM ogrenci
+JOIN Bolum ON Bolum.BolumID = ogrenci.BolumID
+WHERE Bolum.BolumAdı IN ('Bilgisayar Mühendisliği', 'Matematik');
+
+--Her dersin kaç öğrencisi olduğunu hesaplar
+SELECT Ders.DersAdı, COUNT(Notlar.OgrNo) AS OgrenciSayısı
+FROM Ders
+LEFT JOIN Notlar ON Ders.DersKodu = Notlar.DersKodu
+GROUP BY Ders.DersAdı;
+
+-- Derslerin toplam sayısını hesaplar
+SELECT COUNT(*) AS ToplamDersSayısı FROM Ders;
+
+-- Tüm öğrenci,ders, not,bölüm,öğretim üyeleri ve ders programı verilerini listeler
+SELECT * FROM ogrenci;
+SELECT * FROM Ders;
+SELECT * FROM Notlar;
+SELECT * FROM Bolum;
+SELECT * FROM OgretimUyeleri;
+SELECT * FROM DersProgramlari;
