@@ -1,3 +1,9 @@
+-- Bölüm tablosunu oluşturur
+CREATE TABLE Bolum (
+    BolumID INT PRIMARY KEY,
+    BolumAdı VARCHAR(100) NOT NULL
+);
+
 -- Öğrenci tablosunu oluşturur
 create table ogrenci (
     OgrAdı VARCHAR(50) NOT NULL,
@@ -14,12 +20,6 @@ create table Ders (
     DersKodu INT PRIMARY KEY,
     DersAdı VARCHAR(100) NOT NULL,
 	DersSayısı INT
-);
-
--- Bölüm tablosunu oluşturur
-CREATE TABLE Bolum (
-    BolumID INT PRIMARY KEY,
-    BolumAdı VARCHAR(100) NOT NULL
 );
 
 -- Notlar tablosunu oluşturur
@@ -53,6 +53,13 @@ CREATE TABLE DersProgramlari (
     FOREIGN KEY (OgretimUyesiID) REFERENCES OgretimUyeleri(OgretimUyesiID)
 );
 
+-- Bölüm verilerini ekler
+INSERT INTO Bolum (BolumID, BolumAdı)
+VALUES
+(1, 'Bilgisayar Mühendisliği'),
+(2, 'Elektrik Elektronik Mühendisliği'),
+(3, 'Fizik'),
+(4, 'Matematik');
 
 -- Öğrenci verilerini ekler
 INSERT INTO ogrenci (OgrNo, OgrAdı, OgrSoyadı, OgrYası, Cinsiyet, BolumID)
@@ -74,14 +81,6 @@ VALUES
 (105, 'Makine Öğrenmesi',3),
 (106, 'Ağ Temelleri',3),
 (107, 'İşletim Sistemleri',4);
-
--- Bölüm verilerini ekler
-INSERT INTO Bolum (BolumID, BolumAdı)
-VALUES
-(1, 'Bilgisayar Mühendisliği'),
-(2, 'Elektrik Elektronik Mühendisliği'),
-(3, 'Fizik'),
-(4, 'Matematik');
 
 -- Ders verilerini ekler
 INSERT INTO Notlar (OgrNo, DersKodu, VizeNotu, FinalNotu)
