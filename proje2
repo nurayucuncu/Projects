@@ -1,3 +1,5 @@
+***SQL Projesi: Öğrenci Veritabanı Yönetim Sistemi***
+
 -- Bölüm tablosunu oluşturur
 CREATE TABLE Bolum (
     BolumID INT PRIMARY KEY,
